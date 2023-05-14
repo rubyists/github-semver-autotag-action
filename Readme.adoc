@@ -1,0 +1,53 @@
+# Action to automatically create Semantic Release Tags
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+:toc:
+
+This action will create (and push) a Semantic Release Tag to your repository.
+
+It aims to have very little configuration and just do the simple, right thing.
+
+## Usage
+
+In your workflow, after the checkout action add the following step:
+
+```yaml
+- name: Create Semantic Release Tag
+  uses: github.com/rubyists/create-semantic-release-tag@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## Inputs
+
+This takes no inputs, it derives the initial tag from the most recent tag in the repository,
+or starts at 1.0.0. This behavior can be modified by using the DEFAULT_VERSION environment variable.
+
+## Outputs
+
+This action outputs the tag that was created, in the `new-tag` output variable.
+This action outputs the previous tag the `old-tag` output variable.
+
+If old-tag and new-tag are the same, there was either no difference, someone hashtagged #none in
+the commit message, or the tag already points at this commit
+
+## Bumping Major or Patch Versions
+
+To bump the major version, add a line to your commit message that says `#major` or `#breaking`.
+
+To bump the patch version, add a line to your commit message that says `#patch` or `#trivial`.
+
+Otherwise, the minor revision will be bumped
+
+## What about prerelease versions?
+
+Working on support for that, probably in v2
+
+## What about build metadata?
+
+Same as prerelease versions, probably in v2
