@@ -1,0 +1,14 @@
+---
+name: 'Semver Tagging'
+description: 'Automatically add semantic version tags'
+outputs:
+  new-tag:  # id of output
+    description: 'The new tags we added (whitespace separated list)'
+inputs:
+  github-org:
+    description: 'Github org to use'
+    required: true
+    default: rubyists
+runs:
+  using: 'docker'
+  image: './oci/Containerfile'

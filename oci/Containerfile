@@ -1,0 +1,29 @@
+# FROM `skopeo inspect docker://docker.io/ruby:3.2.2@alpine3.18 | jq -r '.Digest'`
+FROM docker.io/ruby@sha256:1df6125b0f90e087123698e1b2df1c6a544a40033a5a14bfa3ef7067863d3474 AS build-env
+# Setting env up
+ENV LANG C.UTF-8
+ENV BUNDLE_SILENCE_ROOT_WARNING=1
+
+#Install dependencies needed for compilation
+RUN apk --update add curl ruby-dev build-base git
+
+COPY Gemfile Gemfile.lock /
+RUN bundle config set build.nokogiri --use-system-libraries && \
+    bundle config set without  'test assets' && \
+    bundle install --jobs 8 && \
+
+COPY . .
+
+# Remove folders not needed in resulting image
+RUN rm -rf node_modules tmp/cache app/assets vendor/assets spec
+############### Build Env step done ###############
+
+############### Build Image ###############
+FROM docker.io/ruby@sha256:1df6125b0f90e087123698e1b2df1c6a544a40033a5a14bfa3ef7067863d3474
+ARG PACKAGES="curl bash"
+
+# install packages
+RUN apk --update --no-cache add $PACKAGES
+COPY --from=build-env /usr/local/bundle/ /usr/local/bundle/
+
+ENTRYPOINT ['bundle', 'exec', '/run.rb']
